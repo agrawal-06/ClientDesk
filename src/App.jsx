@@ -35,10 +35,11 @@ import {
   formatDate,
   activePayments,
 } from "./lib/domain.js";
-import { useWorkspace } from "./lib/use-workspace.js";
+import { cloudRequest } from "./lib/auth.js";
+import { STORAGE_KEY } from "./lib/storage.js";
 import PaymentCorrection from "./components/PaymentCorrection.jsx";
 import RecoveryScreen from "./components/RecoveryScreen.jsx";
-export default function Home() {
+export default function Home({ workspace, account, onOpenAccount }) {
   const {
     data,
     recovery,
@@ -47,7 +48,7 @@ export default function Home() {
     storageError,
     refresh,
     save: saveWorkspace,
-  } = useWorkspace();
+  } = workspace;
   const [view, setView] = useState("Overview"),
     [query, setQuery] = useState(""),
     [filter, setFilter] = useState("All"),
@@ -121,7 +122,7 @@ export default function Home() {
     return (
       <div className="loading">
         <div className="logoMark">C</div>
-        <p>Opening your workspace…</p>
+        <p>{storageError || "Opening your workspace…"}</p>{storageError && <button className="secondary" onClick={refresh}>Retry loading</button>}{onOpenAccount && <button className="secondary" onClick={onOpenAccount}>Cloud account</button>}
       </div>
     );
   const d = data;
@@ -293,7 +294,7 @@ export default function Home() {
         <div className="workspace">
           <span className="avatar">KA</span>
           <div>
-            <strong>Kamana’s workspace</strong>
+            <strong>{account ? (account.name || "Your") + "’s workspace" : "Browser workspace"}</strong>
             <small>Personal workspace</small>
           </div>
           <span className="workspaceDot" />
@@ -336,7 +337,7 @@ export default function Home() {
           <div className="profile">
             <span className="avatar">KA</span>
             <div>
-              <strong>Kamana Agrawal</strong>
+              <strong>{account?.name || "Independent developer"}</strong>
               <small>Independent developer</small>
             </div>
           </div>
@@ -363,14 +364,14 @@ export default function Home() {
             <ChevronRight size={13} />
             <strong>{view}</strong>
           </div>
-          <div className="topRight">
+          <div className="topRight">{onOpenAccount && <button className="secondary" onClick={onOpenAccount}>{account ? "Account" : "Sign in / Cloud"}</button>}
             <span className="localBadge">
               <i />{" "}
               {saving
                 ? "Saving…"
                 : stale
                   ? "Reload required"
-                  : "Stored on this device"}
+                  : workspace.mode === "cloud" ? "Saved to cloud" : "Stored on this device"}
             </span>
             <button
               className="iconButton"
@@ -391,7 +392,7 @@ export default function Home() {
           {stale && (
             <div className="storageNotice" role="alert">
               <span>
-                This workspace changed in another tab. Reload before saving.
+                This workspace changed in another tab or device. Reload before saving.
                 Your open form is unsaved.
               </span>
               <button className="secondary" onClick={reloadLatest}>
@@ -1001,13 +1002,20 @@ export default function Home() {
               <div className="eyebrow">YOUR WORKSPACE</div>
               <h2>Workspace settings</h2>
               <p className="muted">
-                This version saves data in this browser only. It has no cloud
-                sync or app-level login. Export a backup before clearing browser
-                data.
+                {account ? "Changes save to your account in the cloud. Reload to fetch changes from another device. Keep regular JSON backups." : "You are using browser storage. Sign in to use a separate cloud workspace. Your browser records are never uploaded automatically."}
               </p>
               <button className="secondary wide" onClick={exportData}>
                 <Download size={17} /> Export JSON backup
               </button>
+              {account && <div className="cloudImport"><h3>Bring your browser data with you</h3><p>This replaces your cloud workspace with this browser’s records. It keeps the browser copy unchanged.</p><button className="secondary" disabled={saving || stale} onClick={async () => {
+ try { const raw = localStorage.getItem(STORAGE_KEY); if (!raw) throw Error("No saved browser workspace found. You can restore a JSON backup below.");
+ const next = JSON.parse(raw); validateBackup(next);
+ if (confirm("Replace your cloud workspace with this browser’s data? Export your cloud backup first if needed.")) { if (await save(next, "Browser data copied to cloud")) setModal(null); }
+ } catch (err) { setError(err.message); }
+}}>Import browser workspace</button><button className="secondary" onClick={async () => {
+ try { const result = await cloudRequest("/api/workspace/previous", {}, account.id); const link = document.createElement("a"); const url = URL.createObjectURL(new Blob([JSON.stringify(result.data,null,2)],{type:"application/json"})); link.href=url;link.download="clientdesk-previous-cloud.json";link.click();URL.revokeObjectURL(url); }
+ catch(err){setError(err.message)}
+}}>Download previous cloud version</button></div>}
               <label className="importLabel">
                 Restore a ClientDesk backup
                 <input
@@ -1038,14 +1046,14 @@ export default function Home() {
                 </h3>
                 <p>
                   Remove all clients, projects, tasks and payment records from
-                  this device.
+                  this workspace.
                 </p>
                 <button
                   className="danger"
                   onClick={async () => {
                     if (
                       confirm(
-                        "Delete all workspace records on this device? Export a backup first if needed.",
+                        "Clear this workspace? Export a backup first if needed.",
                       )
                     ) {
                       if (
