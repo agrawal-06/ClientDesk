@@ -1,36 +1,55 @@
 # ClientDesk
-A Next.js + TypeScript freelance client, project, task and payment tracker.
+A freelancer workspace built with **React, JavaScript, plain CSS, and Motion**, using Vite.
 
-## Run
-Use Node.js 22 or newer.
+## Run locally
+Use Node.js 22.12 or newer.
 
 ```sh
 npm ci
 npm run dev
-npm test
-npm run build
 ```
 
-The hosted version is a Next.js static export. It saves data in localStorage on the current browser/device. There is no PostgreSQL connection, app-level authentication or cross-device sync. Site access is private to its owner. Sample clients are fictional. Workspace settings let you clear sample data and export/restore JSON backups. Clearing browser storage removes records; export backups regularly.
+Open the URL printed in the terminal. To check and build:
 
-## Features
-- Dashboard with calculated balances and upcoming deadlines
-- Create/edit clients and projects; search and status filters
-- Project checklist and status updates
-- Record payments; prevent overpayments and future payment dates
-- Exact integer-paise money calculations
-- Responsive layout; accessible native dialogs
-- Validated JSON backup and restore
+```sh
+npm test
+npm run build
+npm run preview
+```
 
-## Source
-`app/page.tsx` is the application UI. `app/globals.css` is responsive styling. `lib/domain.ts` contains domain types, calculations and demo records. `lib/backup.ts` validates imports. `prisma/schema.prisma` is a proposed PostgreSQL schema, not an active integration.
+## Understand the project
+| File | What it does |
+| --- | --- |
+| `index.html` | The page that loads the app |
+| `src/main.jsx` | Starts React, loads CSS and sets animation preferences |
+| `src/App.jsx` | Dashboard, clients, projects and payments screens |
+| `src/components/` | Payment correction and recovery screens |
+| `src/lib/domain.js` | Money calculations, dates and payment rules |
+| `src/lib/backup.js` | Checks imported and saved data |
+| `src/lib/storage.js` | Saves to the browser without overwriting newer changes |
+| `src/lib/use-workspace.js` | Connects React state to storage |
+| `src/styles/` | Layout and skeuomorphic desk theme |
 
-## Next implementation milestone
-Connect PostgreSQL to a server-capable deployment; remove static export configuration. Install/configure Prisma for the chosen version and database. Add a maintained authentication provider; derive ownerId from verified server sessions, never browser input. Enforce ownership for every query and relation; validate every mutation on the server. Record payment/budget updates in serializable transactions so simultaneous requests cannot overpay. Add database constraints for positive amounts. Add auth/authorization and transaction tests before accepting real multi-user data. Never place DATABASE_URL in a NEXT_PUBLIC variable or commit secrets.
+A component is a function that describes part of the screen. State holds values React displays. An event, such as submitting a form, validates input, saves changes and updates the screen. Start by reading `main.jsx`, then `App.jsx`, then the shared rules in `domain.js`.
 
-## Local data safety
-Workspace data is validated on load and import. Unreadable records open recovery without replacing the original; you can download the raw data or restore a valid backup. Restore and clear operations retain an original copy under a separate localStorage recovery key before changing the workspace. These copies are on this browser only and are lost if browser storage is cleared, so keep downloaded backups.
+Motion adds subtle screen transitions and respects reduced-motion preferences. All styling is plain CSS; no Tailwind.
 
-Saves use Web Locks and a snapshot comparison to stop outdated tabs from overwriting newer changes. A stale tab must reload before saving; its open form stays visible until you choose to discard it. A current browser on HTTPS (or localhost) with Web Locks is required. Reload all previously open ClientDesk tabs after upgrading, since old versions do not participate in this protection.
+## What works
+- Create/edit clients and projects
+- Budgets, deadlines, checklists, search and status filters
+- Record payments and calculate outstanding balances
+- Correct or void a payment while preserving originals and reasons
+- JSON backup/restore, validation and unreadable-data recovery
+- Protection against stale tabs overwriting newer changes
 
-Payment history supports corrections and voids with a required reason. Originals remain visible, replacements link to the original, and totals exclude voided entries. These are local bookkeeping records, not bank transactions or a tamper-proof audit trail.
+Money is stored in integer paise to avoid rounding errors. The conversion keeps the original `clientdesk.v1` storage key and data format. Existing records on the same site and browser remain readable. Refresh older open tabs after upgrading.
+
+## Current storage
+This milestone still saves on the current browser/device. It has **no backend, app accounts, Neon connection, or cross-device sync yet**. The hosted preview remains owner-private. Export backups regularly: clearing browser storage deletes records and local recovery copies.
+
+Saves use Web Locks and snapshot comparisons. Outdated tabs must reload before saving. Use a current browser over HTTPS or localhost. Restore/clear operations keep the previous raw data under a separate localStorage recovery key before replacement. Payment corrections are local bookkeeping records, not real bank transfers or a tamper-proof audit log.
+
+## Next milestone
+Add a **Node.js + Express REST API** and **Neon PostgreSQL**. Node keeps both frontend and backend in JavaScript. Add authenticated ownership checks and a deliberate import step before connecting real records. Database credentials belong on the server, never in React or a `VITE_` variable.
+
+Next.js, TypeScript and the unused proposed Prisma schema have been removed. The deployed app is a Vite static build.
