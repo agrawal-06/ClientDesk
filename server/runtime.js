@@ -1,10 +1,12 @@
 import { Pool } from "pg";
 import { attachDatabasePool } from "@neon/functions";
+import { attachDatabasePool as attachVercelPool } from "@vercel/functions";
 import { createRemoteJWKSet, jwtVerify } from "jose";
 import { workspaceStore } from "./workspace.js";
 
-const pool = new Pool({ connectionString: process.env.DATABASE_URL, max: 5 });
-attachDatabasePool(pool);
+const pool = new Pool({ connectionString: process.env.DATABASE_URL, max: 5, idleTimeoutMillis: 5000, connectionTimeoutMillis: 10000 });
+if (process.env.VERCEL) attachVercelPool(pool);
+else attachDatabasePool(pool);
 const jwks = createRemoteJWKSet(new URL(process.env.NEON_AUTH_JWKS_URL));
 const issuer = new URL(process.env.NEON_AUTH_BASE_URL).origin;
 export const dependencies = {
@@ -19,3 +21,4 @@ export const dependencies = {
 export const allowedOrigins = new Set(
   (process.env.ALLOWED_ORIGINS || "").split(",").map(value => value.trim()).filter(Boolean),
 );
+

@@ -23,3 +23,4 @@ export async function cloudRequest(path, options = {}, expectedOwner) {
   if (!response.ok) throw Object.assign(new Error(result.error || "Could not reach cloud storage."), { status: response.status });
   return result;
 }
+

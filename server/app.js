@@ -27,3 +27,4 @@ export function createApp(dependencies, allowedOrigins) {
   });
   return app;
 }
+

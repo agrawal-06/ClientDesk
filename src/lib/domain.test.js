@@ -33,3 +33,4 @@ test("remaining balance and overpayment protection", () => {
   assert.throws(() => validPayment(data, "unknown", 100));
   assert.throws(() => validPayment(data, "p", -100));
 });
+

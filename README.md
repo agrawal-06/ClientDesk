@@ -71,7 +71,7 @@ Cloud saves happen when you submit changes. Other devices see the latest records
 | `server/function.js` | Fetch adapter for Neon Functions hosting |
 | `server/schema.sql` | Database table definition |
 
-The local backend uses Node.js + Express. The deployed backend uses the same service code through a small Fetch adapter on Neon Functions. React is a static Vite build. Database passwords stay on the server; public auth/API URLs are safe in frontend code.
+The local backend uses Node.js + Express. The Vercel deployment serves Express through `api/workspace.js` and `api/workspace/previous.js`. The older Neon Functions endpoint remains available to the original Site. React is a static Vite build. Database passwords stay on the server; public auth/API URLs are safe in frontend code.
 
 ### Run your own backend
 Copy `.env.example` to `.env`. Set your branch's `DATABASE_URL`, `NEON_AUTH_BASE_URL`, and `NEON_AUTH_JWKS_URL`, and run `server/schema.sql` on that branch. Start `npm run server` and `npm run dev` in separate terminals. Set `VITE_API_URL` and `VITE_NEON_AUTH_URL` to your endpoints, then restart Vite. Add your frontend origin to Neon Auth's trusted domains and the API's `ALLOWED_ORIGINS`.
@@ -91,3 +91,16 @@ For a separate deployment, use your own Neon project and replace the public URLs
 `npm test` covers validation, local recovery, payment corrections, ownership, version conflicts and account switching. `server/cloud-check.js` is an **optional live smoke test** that creates a synthetic QA account and sample empty workspace on the configured service; it is not part of the normal test command. No real client records are used.
 
 Payment corrections are bookkeeping records, not bank transfers or a tamper-proof audit log. Keep exporting backups; cloud recovery retains only one previous save.
+
+
+## Vercel full-stack deployment
+Frontend and API are hosted together at https://clientdesk-eta.vercel.app. Set these production environment variables in Vercel before deployment:
+
+- `DATABASE_URL`: Neon pooled connection string (sensitive, server only).
+- `NEON_AUTH_BASE_URL` and `NEON_AUTH_JWKS_URL`: branch auth endpoints.
+- `ALLOWED_ORIGINS`: exact frontend origins, comma separated.
+- `VITE_NEON_AUTH_URL`: public auth endpoint.
+- `VITE_API_URL=/`: use this deployment's API.
+- `VITE_LOCAL_ONLY=false`: enable accounts.
+
+The Functions run in Singapore, alongside the existing Neon database region. `@vercel/functions` manages the shared PostgreSQL pool during Function suspension. Authentication, owner checks, validation and save-conflict logic are shared with the local Express server. No database credentials are embedded in the frontend. Preview deployments are not configured to write to the production database.

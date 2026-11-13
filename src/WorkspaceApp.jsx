@@ -31,3 +31,4 @@ export default function WorkspaceApp() {
       : <App key={user?.id || "local"} workspace={workspace} account={user} onOpenAccount={cloudEnabled ? ()=>setAccountOpen(true) : null}/>}
   </>;
 }
+

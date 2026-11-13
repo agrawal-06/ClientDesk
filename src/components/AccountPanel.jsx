@@ -41,3 +41,4 @@ export default function AccountPanel({ user, onClose, onChanged }) {
     {message && <p role="status" className="formError">{message}</p>}
   </section></div>;
 }
+

@@ -6,3 +6,4 @@ CREATE TABLE IF NOT EXISTS clientdesk_workspaces (
   version integer NOT NULL DEFAULT 1 CHECK (version > 0),
   updated_at timestamptz NOT NULL DEFAULT now()
 );
+

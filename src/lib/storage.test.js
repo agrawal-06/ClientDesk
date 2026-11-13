@@ -167,3 +167,4 @@ test("backup rejects duplicate replacement history", () => {
   d.payments.push({ ...d.payments.at(-1), id: "duplicate" });
   assert.throws(() => validateBackup(d));
 });
+

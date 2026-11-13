@@ -48,3 +48,4 @@ try {
  console.log('Live smoke check passed: signup, JWT, database save/read, conflict, account guard, previous version, signout and signin.');
  process.exit(0);
 } catch(error) {console.error('Live smoke check failed:',error.message);process.exitCode=1;}
+

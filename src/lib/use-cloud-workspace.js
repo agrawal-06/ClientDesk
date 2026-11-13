@@ -48,3 +48,4 @@ export function useCloudWorkspace(user) {
   }
   return { data: snapshot?.data ?? null, recovery: null, storageError, stale, saving, refresh, save, mode: "cloud" };
 }
+
