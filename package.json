@@ -6,7 +6,7 @@
     "dev": "node scripts/dev.mjs",
     "build": "next build",
     "typecheck": "tsc --noEmit",
-    "test": "node --experimental-strip-types --test lib/domain.test.ts"
+    "test": "node --experimental-strip-types --test lib/*.test.ts"
   },
   "dependencies": {
     "next": "^16.0.0",

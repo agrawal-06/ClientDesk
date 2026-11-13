@@ -27,3 +27,10 @@ The hosted version is a Next.js static export. It saves data in localStorage on 
 
 ## Next implementation milestone
 Connect PostgreSQL to a server-capable deployment; remove static export configuration. Install/configure Prisma for the chosen version and database. Add a maintained authentication provider; derive ownerId from verified server sessions, never browser input. Enforce ownership for every query and relation; validate every mutation on the server. Record payment/budget updates in serializable transactions so simultaneous requests cannot overpay. Add database constraints for positive amounts. Add auth/authorization and transaction tests before accepting real multi-user data. Never place DATABASE_URL in a NEXT_PUBLIC variable or commit secrets.
+
+## Local data safety
+Workspace data is validated on load and import. Unreadable records open recovery without replacing the original; you can download the raw data or restore a valid backup. Restore and clear operations retain an original copy under a separate localStorage recovery key before changing the workspace. These copies are on this browser only and are lost if browser storage is cleared, so keep downloaded backups.
+
+Saves use Web Locks and a snapshot comparison to stop outdated tabs from overwriting newer changes. A stale tab must reload before saving; its open form stays visible until you choose to discard it. A current browser on HTTPS (or localhost) with Web Locks is required. Reload all previously open ClientDesk tabs after upgrading, since old versions do not participate in this protection.
+
+Payment history supports corrections and voids with a required reason. Originals remain visible, replacements link to the original, and totals exclude voided entries. These are local bookkeeping records, not bank transactions or a tamper-proof audit trail.
