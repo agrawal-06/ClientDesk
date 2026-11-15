@@ -1,0 +1,334 @@
+.business-tools {
+  min-width: 0;
+}
+.business-cover {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 30px 34px;
+  background: var(--grain), linear-gradient(120deg, #e2d4b7, #f3e8d2);
+  border: 1px solid #d4c6aa;
+  border-radius: 12px;
+  box-shadow:
+    inset 0 2px 1px #fff9,
+    0 5px 0 #d0c3a8,
+    0 9px 16px #49381c13;
+  margin: 0 0 28px;
+}
+.business-cover h2 {
+  font:
+    32px/1.2 Georgia,
+    serif;
+  margin: 10px 0;
+}
+.business-cover p {
+  color: #656250;
+  margin: 8px 0;
+  line-height: 1.6;
+}
+.business-stamp {
+  border: 3px double #85694c;
+  border-radius: 50%;
+  padding: 22px 10px;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-align: center;
+  transform: rotate(-12deg);
+  color: #85694c;
+  flex-shrink: 0;
+}
+.business-tabs {
+  display: flex;
+  gap: 8px;
+  overflow: auto;
+  padding: 6px 3px 18px;
+  margin-bottom: 8px;
+}
+.business-tabs button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  padding: 12px 14px;
+  background: linear-gradient(#faf7ef, #e7e1d3);
+  border: 1px solid #d2ccbf;
+  border-radius: 7px;
+  box-shadow: 0 3px 0 #c8c0af;
+  color: #55584c;
+}
+.business-tabs button.selected {
+  background: linear-gradient(#3f4c41, #2c382f);
+  color: #f8f1df;
+  border-color: #233327;
+  box-shadow: inset 0 2px 4px #16221988;
+}
+.business-paper {
+  background: var(--grain), var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  box-shadow: var(--shadow);
+  padding: 26px;
+  margin: 18px 0;
+}
+.business-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  padding-bottom: 20px;
+  border-bottom: 1px dashed #d8d2c1;
+}
+.business-heading h2 {
+  font:
+    27px Georgia,
+    serif;
+  margin: 0 0 8px;
+}
+.business-heading p,
+.business-footnote {
+  font-size: 13px;
+  line-height: 1.6;
+  color: #686b60;
+  max-width: 690px;
+}
+.business-tools button,
+.client-portal button {
+  cursor: pointer;
+  font: inherit;
+}
+.business-tools button:not(.primary),
+.client-portal button:not(.primary) {
+  border: 1px solid #d6d0c1;
+  border-radius: 6px;
+  padding: 8px 12px;
+  background: #f2eee3;
+  color: #414b40;
+}
+.business-tools button:disabled,
+.client-portal button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.business-tools .business-tabs .selected {
+  background: #344237;
+  color: #fff;
+}
+.business-message {
+  background: #f5e8ce;
+  border-left: 3px solid #bd603b;
+  padding: 14px;
+  overflow-wrap: anywhere;
+}
+.business-field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  min-width: 0;
+  font-size: 13px;
+  font-weight: 600;
+}
+.business-field input,
+.business-field select,
+.business-field textarea,
+.business-record select {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 11px;
+  border-radius: 6px;
+  border: 1px solid #d1cbbb;
+  background: #f6f3e9;
+  color: #353731;
+  box-shadow: inset 0 2px 3px #463d2510;
+  font: inherit;
+}
+.business-field textarea {
+  min-height: 92px;
+  resize: vertical;
+}
+.business-form {
+  background: #f8f5ec;
+  padding: 20px;
+  border: 1px solid #ded7c7;
+  border-radius: 8px;
+  margin: 20px 0;
+  display: grid;
+  gap: 18px;
+}
+.business-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+.business-line {
+  display: grid;
+  grid-template-columns: 3fr 1fr 1fr auto;
+  gap: 10px;
+  align-items: end;
+}
+.business-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.business-records {
+  margin: 20px 0;
+}
+.business-record {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 19px 0;
+  border-bottom: 1px solid #e4ded0;
+  overflow-wrap: anywhere;
+}
+.business-record > div:first-child {
+  min-width: 0;
+}
+.business-record p {
+  font-size: 14px;
+  white-space: pre-wrap;
+  line-height: 1.6;
+  margin: 6px 0;
+}
+.business-record small {
+  display: block;
+  line-height: 1.6;
+}
+.business-empty {
+  text-align: center;
+  padding: 46px 20px;
+  color: #777c6b;
+}
+.business-empty h3 {
+  font:
+    25px Georgia,
+    serif;
+  color: #4c5849;
+}
+.business-reminders {
+  background: #eee6c9;
+  border: 1px dashed #c9b983;
+  border-radius: 6px;
+  padding: 18px;
+  margin: 20px 0;
+  font-size: 13px;
+}
+.business-reminders > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+.business-reminders span {
+  padding: 7px 10px;
+  border-radius: 4px;
+  background: #fff9e9;
+}
+.business-reminders .overdue {
+  color: #9a3d27;
+  background: #fbe7dc;
+}
+.business-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin: 20px 0;
+}
+.business-stats > div {
+  background: #efece1;
+  border: 1px solid #d8d0bd;
+  border-radius: 8px;
+  padding: 18px;
+  box-shadow: inset 0 1px 2px #fff;
+}
+.business-stats strong {
+  display: block;
+  font:
+    25px Georgia,
+    serif;
+  margin-top: 12px;
+}
+.business-timer {
+  padding: 20px;
+  background: #e6ecdf;
+  margin: 20px 0;
+  border: 1px solid #cbd3bd;
+  border-radius: 8px;
+  display: grid;
+  gap: 15px;
+}
+.business-timer form,
+.business-inline {
+  display: flex;
+  align-items: end;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+.business-inline {
+  margin: 20px 0;
+}
+.client-portal {
+  max-width: 960px;
+  margin: 40px auto;
+  padding: 20px;
+}
+.client-portal h1 {
+  font:
+    34px Georgia,
+    serif;
+}
+.client-portal progress {
+  accent-color: #617153;
+  max-width: 150px;
+}
+.business-tools input:focus-visible,
+.business-tools select:focus-visible,
+.business-tools textarea:focus-visible {
+  outline: 2px solid #bd603b;
+  outline-offset: 2px;
+}
+@media (max-width: 680px) {
+  .business-cover {
+    padding: 23px;
+  }
+  .business-cover h2 {
+    font-size: 26px;
+  }
+  .business-stamp {
+    display: none;
+  }
+  .business-paper {
+    padding: 18px;
+  }
+  .business-heading,
+  .business-record {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
+  }
+  .business-form-grid {
+    grid-template-columns: 1fr;
+  }
+  .business-line {
+    grid-template-columns: 1fr 1fr;
+  }
+  .business-line > .business-field:first-child {
+    grid-column: 1/-1;
+  }
+  .business-stats {
+    grid-template-columns: 1fr;
+  }
+  .business-form {
+    padding: 14px;
+  }
+  .business-timer form > * {
+    width: 100%;
+  }
+  .client-portal {
+    margin: 0;
+    padding: 14px;
+  }
+}

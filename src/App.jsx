@@ -1,3 +1,4 @@
+import BusinessTools, { Reminders } from './components/BusinessTools.jsx';
 import { motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { validateBackup } from "./lib/backup.js";
@@ -306,6 +307,7 @@ export default function Home({ workspace, account, onOpenAccount }) {
             { name: "Projects", icon: FolderKanban },
             { name: "Clients", icon: Users },
             { name: "Payments", icon: Wallet },
+            { name: "Business tools", icon: SlidersHorizontal },
           ].map(({ name, icon: Icon }) => (
             <button
               className={view === name ? "nav active" : "nav"}
@@ -416,7 +418,7 @@ export default function Home({ workspace, account, onOpenAccount }) {
                     ? "From first conversation to final handover."
                     : view === "Clients"
                       ? "Good work starts with good relationships."
-                      : "Keep track of what’s received and what’s remaining."}
+                      : view === "Business tools" ? "The details that keep your freelance business moving." : "Keep track of what’s received and what’s remaining."}
               </p>
             </div>
             <button
@@ -440,6 +442,8 @@ export default function Home({ workspace, account, onOpenAccount }) {
                   : "New project"}
             </button>
           </div>
+          {view === "Business tools" && <BusinessTools workspace={workspace} account={account} />}
+          {view === "Overview" && <Reminders data={d} />}
           {view === "Overview" && (
             <section className="deskHero">
               <div className="heroCopy">
@@ -1002,7 +1006,7 @@ export default function Home({ workspace, account, onOpenAccount }) {
               <div className="eyebrow">YOUR WORKSPACE</div>
               <h2>Workspace settings</h2>
               <p className="muted">
-                {account ? "Changes save to your account in the cloud. Reload to fetch changes from another device. Keep regular JSON backups." : "You are using browser storage. Sign in to use a separate cloud workspace. Your browser records are never uploaded automatically."}
+                {account ? "Changes save to your account in the cloud. Reload to fetch changes from another device. Keep regular JSON backups. Attachments, portal links and online receipts are stored separately; JSON backups do not include them. Download important attachments separately." : "You are using browser storage. Sign in to use a separate cloud workspace. Your browser records are never uploaded automatically."}
               </p>
               <button className="secondary wide" onClick={exportData}>
                 <Download size={17} /> Export JSON backup

@@ -1,3 +1,4 @@
+import { validateBusiness } from './business.js';
 import { statuses, isCalendarDate, today } from "./domain.js";
 export function validateBackup(raw) {
   if (!raw || typeof raw !== "object") throw new Error("Invalid workspace");
@@ -77,6 +78,7 @@ export function validateBackup(raw) {
     payments.size !== d.payments.length
   )
     throw new Error("Duplicate IDs");
+  validateBusiness(d);
   const replaced = new Set();
   for (const p of d.projects)
     if (!clients.has(p.clientId)) throw new Error("Missing client");

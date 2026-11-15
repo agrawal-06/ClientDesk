@@ -2,7 +2,7 @@ import { createAuthClient } from "@neon/auth";
 import { BetterAuthReactAdapter } from "@neon/auth/react/adapters";
 
 const authUrl = import.meta.env.VITE_NEON_AUTH_URL || "https://ep-damp-hat-az0isqf9.neonauth.c-3.ap-southeast-1.aws.neon.tech/clientdesk/auth";
-const apiUrl = import.meta.env.VITE_API_URL || "https://br-autumn-shape-azzp8wry-clientdesk.compute.c-3.ap-southeast-1.aws.neon.tech";
+export const apiUrl = import.meta.env.VITE_API_URL || "https://br-autumn-shape-azzp8wry-clientdesk.compute.c-3.ap-southeast-1.aws.neon.tech";
 
 export const cloudEnabled = import.meta.env.VITE_LOCAL_ONLY !== "true";
 export const auth = cloudEnabled ? createAuthClient(authUrl, {

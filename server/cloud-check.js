@@ -5,8 +5,8 @@ import { createAuthClient } from '@neon/auth';
 import { BetterAuthVanillaAdapter } from '@neon/auth/vanilla/adapters';
 import { emptyWorkspace } from './workspace.js';
 const base = 'https://ep-damp-hat-az0isqf9.neonauth.c-3.ap-southeast-1.aws.neon.tech/clientdesk/auth';
-const api = 'https://br-autumn-shape-azzp8wry-clientdesk.compute.c-3.ap-southeast-1.aws.neon.tech';
-const origin = 'https://clientdesk-kamana-0613.festivecockatoo8.chatgpt.site';
+const api = process.env.CLIENTDESK_API_URL || 'https://clientdesk-eta.vercel.app';
+const origin = 'https://clientdesk-eta.vercel.app';
 const cookies = new Map();
 setTimeout(()=>{console.error('Smoke check timed out');process.exit(1)},120000).unref();
 // Node has no browser cookie jar. Keep synthetic test cookies in memory only.
