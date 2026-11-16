@@ -5,6 +5,7 @@ import { createAuthClient } from "@neon/auth";
 import { BetterAuthVanillaAdapter } from "@neon/auth/vanilla/adapters";
 import { seed, today } from "../src/lib/domain.js";
 import { generateDue, business } from "../src/lib/business.js";
+import { invoiceBalance } from "../src/lib/invoices.js";
 const base =
   "https://ep-damp-hat-az0isqf9.neonauth.c-3.ap-southeast-1.aws.neon.tech/clientdesk/auth";
 const api =
@@ -88,12 +89,38 @@ try {
     terms: "Synthetic test only",
     date: today(),
     due: today(),
-    items: [{ description: "Test service", quantity: 1, rate: 100 }],
+    items: [{ description: "Test service", quantity: 1, rate: 100000 }],
+    discountType: "fixed",
+    discountValue: 10000,
+    taxRate: 1800,
+    receipts: [
+      {
+        id: "receipt-qa",
+        date: today(),
+        amount: 40000,
+        note: "PRIVATE_RECEIPT_NOTE",
+      },
+    ],
   };
   const data = {
     ...baseData,
     business: {
       invoices: [invoice],
+      leads: [
+        {
+          id: "lead-qa",
+          name: "QA lead",
+          business: "QA shop",
+          email: "qa@example.com",
+          phone: "",
+          source: "Instagram",
+          stage: "Qualified",
+          value: 1500000,
+          nextFollowup: today(),
+          created: today(),
+          notes: "PRIVATE_LEAD_NOTE",
+        },
+      ],
       notes: [
         {
           id: "private-note",
@@ -212,6 +239,29 @@ try {
   assert.equal(view.data.files[0].id, sharedFile.id);
   assert.equal(JSON.stringify(view.data).includes("PRIVATE_QA_NOTE"), false);
   assert.equal(view.data.invoices.length, 1);
+  assert.equal(invoiceBalance(view.data.invoices[0]).remaining, 66200);
+  assert.equal(invoiceBalance(view.data.invoices[0]).status, "Partially paid");
+  assert.equal(
+    JSON.stringify(view.data).includes("PRIVATE_RECEIPT_NOTE"),
+    false,
+  );
+  assert.equal(JSON.stringify(view.data).includes("PRIVATE_LEAD_NOTE"), false);
+  const invalid = {
+    ...data,
+    business: {
+      ...data.business,
+      invoices: [
+        {
+          ...invoice,
+          receipts: [
+            ...invoice.receipts,
+            { id: "overpay", date: today(), amount: 100000, note: "" },
+          ],
+        },
+      ],
+    },
+  };
+  assert.equal((await call("PUT", { version: 1, data: invalid })).status, 400);
   assert.equal(
     (await portal({ action: "download", id: privateFile.id })).status,
     404,

@@ -1,3 +1,4 @@
+import { invoiceBalance } from "../lib/invoices.js";
 import { useEffect, useState } from "react";
 import { apiUrl } from "../lib/auth.js";
 import { money } from "../lib/domain.js";
@@ -90,9 +91,8 @@ export default function ClientPortal() {
             <h2>Invoices</h2>
             {!data.invoices.length && <p>No invoices yet.</p>}
             {data.invoices.map((i) => {
-              const paid = data.receipts.some(
-                (r) => r.invoice_id === i.id && r.payment_id,
-              );
+              const balance = invoiceBalance(i, data.receipts);
+              const paid = balance.remaining === 0;
               return (
                 <article className="business-record" key={i.id}>
                   <div>
@@ -100,12 +100,17 @@ export default function ClientPortal() {
                       {i.number} · {money(total(i))}
                     </strong>
                     <p>
-                      Due {i.due} · {paid ? "Paid online" : "Awaiting payment"}
+                      Due {i.due} · {balance.status} · Balance{" "}
+                      {money(balance.remaining)}
                     </p>
                   </div>
                   <div className="business-actions">
                     <button
-                      onClick={() => run(() => printDocument(i, data.client))}
+                      onClick={() =>
+                        run(() =>
+                          printDocument(i, data.client, false, data.receipts),
+                        )
+                      }
                     >
                       Print / PDF
                     </button>

@@ -1,3 +1,7 @@
+import ProjectCalendar from "./ProjectCalendar.jsx";
+import LeadPipeline from "./LeadPipeline.jsx";
+import InvoiceDetails from "./InvoiceDetails.jsx";
+import { invoiceBalance } from "../lib/invoices.js";
 import { useEffect, useState } from "react";
 import {
   FileText,
@@ -22,6 +26,8 @@ import { printDocument, downloadFile } from "../lib/documents.js";
 import "../styles/business.css";
 
 const tabs = [
+  ["calendar", "Calendar", CalendarClock],
+  ["leads", "Lead pipeline", NotebookPen],
   ["invoices", "Invoices", FileText],
   ["notes", "Project notes", NotebookPen],
   ["followups", "Follow-ups", CalendarClock],
@@ -81,6 +87,7 @@ export default function BusinessTools({ workspace, account }) {
     [busy, setBusy] = useState(false),
     [cloud, setCloud] = useState(null),
     [link, setLink] = useState("");
+  const [invoiceId, setInvoiceId] = useState(null);
   const [form, setForm] = useState(null),
     [now, setNow] = useState(Date.now());
   useEffect(() => {
@@ -268,7 +275,32 @@ export default function BusinessTools({ workspace, account }) {
         ))}
       </nav>
       <div className="business-paper">
-        <header className="business-heading">
+        {tab === "calendar" && <ProjectCalendar data={d} />}
+        {tab === "leads" && (
+          <LeadPipeline data={d} onSave={save} disabled={blocked} />
+        )}
+        {tab === "invoices" &&
+          invoiceId &&
+          b.invoices.some((i) => i.id === invoiceId) && (
+            <InvoiceDetails
+              key={invoiceId}
+              invoice={b.invoices.find((i) => i.id === invoiceId)}
+              online={cloud?.receipts ?? []}
+              disabled={blocked}
+              onClose={() => setInvoiceId(null)}
+              onSave={(row) =>
+                change(
+                  "invoices",
+                  b.invoices.map((i) => (i.id === row.id ? row : i)),
+                )
+              }
+            />
+          )}
+
+        <header
+          className="business-heading"
+          hidden={["calendar", "leads"].includes(tab)}
+        >
           <div>
             <h2>{tabs.find((t) => t[0] === tab)[1]}</h2>
             <p>
@@ -287,7 +319,7 @@ export default function BusinessTools({ workspace, account }) {
                           : "Small details, kept in one place."}
             </p>
           </div>
-          {!["portal", "files"].includes(tab) && (
+          {!["portal", "files", "calendar", "leads"].includes(tab) && (
             <button className="primary" disabled={blocked} onClick={startForm}>
               + Add {tab === "timeEntries" ? "manual time" : "new"}
             </button>
@@ -661,7 +693,7 @@ export default function BusinessTools({ workspace, account }) {
             Generate due invoices now
           </button>
         )}
-        {!["portal", "files"].includes(tab) && (
+        {!["portal", "files", "calendar", "leads"].includes(tab) && (
           <div className="business-records">
             {b[tab].length === 0 && (
               <div className="business-empty">
@@ -705,17 +737,20 @@ export default function BusinessTools({ workspace, account }) {
                       : ""}
                     {tab === "invoices"
                       ? " · " +
-                        (cloud?.receipts?.some(
-                          (r) => r.invoice_id === row.id && r.payment_id,
+                        invoiceBalance(row, cloud?.receipts ?? []).status +
+                        " · Due " +
+                        money(
+                          invoiceBalance(row, cloud?.receipts ?? []).remaining,
                         )
-                          ? "Paid online"
-                          : row.due < today()
-                            ? "Due date passed"
-                            : "Awaiting payment")
                       : ""}
                   </small>
                 </div>
                 <div className="business-actions">
+                  {tab === "invoices" && (
+                    <button onClick={() => setInvoiceId(row.id)}>
+                      Details / payments
+                    </button>
+                  )}
                   {["invoices", "proposals"].includes(tab) && (
                     <button
                       onClick={() =>
@@ -724,6 +759,7 @@ export default function BusinessTools({ workspace, account }) {
                             row,
                             d.clients.find((c) => c.id === row.clientId),
                             tab === "proposals",
+                            cloud?.receipts ?? [],
                           ),
                         )
                       }

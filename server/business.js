@@ -1,3 +1,4 @@
+import { invoiceBalance } from "../src/lib/invoices.js";
 import {
   randomBytes,
   randomUUID,
@@ -160,11 +161,9 @@ export async function webhook(req, res, { pool }, env = process.env) {
       await recordCapture(pool, event.payload?.payment?.entity);
     res.json({ received: true });
   } catch (e) {
-    res
-      .status(e.status || 503)
-      .json({
-        error: e.status ? e.message : "Could not process payment event.",
-      });
+    res.status(e.status || 503).json({
+      error: e.status ? e.message : "Could not process payment event.",
+    });
   }
 }
 export async function businessHandler(
@@ -288,27 +287,29 @@ export async function businessHandler(
         );
         if (existing.rows[0]?.payment_id)
           fail("This invoice is already paid.", 409);
+        const due = invoiceBalance(doc).remaining;
+        if (due <= 0) fail("This invoice is already paid.", 409);
         let orderId = existing.rows[0]?.order_id;
-        if (existing.rows[0] && Number(existing.rows[0].amount) !== total(doc))
+        if (existing.rows[0] && Number(existing.rows[0].amount) !== due)
           fail(
             "Invoice total changed after checkout was created. Contact the workspace owner.",
             409,
           );
         if (!orderId) {
           const order = await gateway(env, "orders", {
-            amount: total(doc),
+            amount: due,
             currency: "INR",
             receipt: randomUUID(),
           });
           orderId = order.id;
           await db.query(
             "INSERT INTO clientdesk_orders(order_id,owner_id,invoice_id,amount) VALUES($1,$2,$3,$4)",
-            [orderId, owner, doc.id, total(doc)],
+            [orderId, owner, doc.id, due],
           );
         }
         return {
           orderId,
-          amount: total(doc),
+          amount: due,
           key: env.RAZORPAY_KEY_ID,
           number: doc.number,
         };
@@ -413,12 +414,10 @@ export async function businessHandler(
     });
     res.json(result);
   } catch (e) {
-    res
-      .status(e.status || 503)
-      .json({
-        error: e.status
-          ? e.message
-          : "Business tools are temporarily unavailable. Try again.",
-      });
+    res.status(e.status || 503).json({
+      error: e.status
+        ? e.message
+        : "Business tools are temporarily unavailable. Try again.",
+    });
   }
 }

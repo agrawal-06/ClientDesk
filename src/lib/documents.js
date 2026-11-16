@@ -1,5 +1,5 @@
 import { money } from "./domain.js";
-import { total } from "./business.js";
+import { invoiceAmounts, invoiceBalance } from "./invoices.js";
 const escape = (value) =>
   String(value ?? "").replace(
     /[&<>"']/g,
@@ -8,7 +8,9 @@ const escape = (value) =>
         c
       ],
   );
-export function printDocument(doc, client, proposal = false) {
+export function printDocument(doc, client, proposal = false, online = []) {
+  const amounts = invoiceAmounts(doc);
+  const balance = invoiceBalance(doc, online);
   const popup = window.open("", "_blank");
   if (!popup)
     throw Error("Allow pop-ups to print or save this document as PDF.");
@@ -18,7 +20,7 @@ export function printDocument(doc, client, proposal = false) {
   body{font:15px/1.6 system-ui;color:#303a34;max-width:800px;margin:48px auto;padding:24px}header{display:flex;justify-content:space-between;border-bottom:3px solid #bd603b;padding-bottom:24px}h1{font-size:32px;margin:0}p{white-space:pre-wrap}table{width:100%;border-collapse:collapse;margin:32px 0}th,td{text-align:left;padding:12px;border-bottom:1px solid #ddd}th:last-child,td:last-child{text-align:right}.total{text-align:right;font-size:22px}button{padding:12px;margin-bottom:24px}footer{margin-top:48px;color:#666;font-size:12px}@media print{button{display:none}body{margin:0;padding:12mm}tr{break-inside:avoid}}</style></head><body>
   <button onclick="window.print()">Print / Save as PDF</button><header><div><h1>${proposal ? "Proposal" : "Invoice"}</h1><strong>${escape(doc.number)}</strong></div><p>${escape(doc.issuer)}</p></header>
   <p><strong>Prepared for</strong><br>${escape(client?.name)}<br>${escape(client?.business)}</p><p>Date: ${escape(doc.date)} · ${proposal ? "Valid until" : "Due"}: ${escape(doc.due)}</p>
-  <table><thead><tr><th>Description</th><th>Qty</th><th>Rate</th><th>Amount</th></tr></thead><tbody>${doc.items.map((i) => `<tr><td>${escape(i.description)}</td><td>${i.quantity}</td><td>${money(i.rate)}</td><td>${money(i.rate * i.quantity)}</td></tr>`).join("")}</tbody></table><p class="total"><strong>Total ${money(total(doc))}</strong></p><p>${escape(doc.terms)}</p><footer>Prepared with ClientDesk · Amounts in INR</footer></body></html>`);
+  <table><thead><tr><th>Description</th><th>Qty</th><th>Rate</th><th>Amount</th></tr></thead><tbody>${doc.items.map((i) => `<tr><td>${escape(i.description)}</td><td>${i.quantity}</td><td>${money(i.rate)}</td><td>${money(i.rate * i.quantity)}</td></tr>`).join("")}</tbody></table><p style="text-align:right">Subtotal ${money(amounts.subtotal)}<br>Discount −${money(amounts.discount)}<br>Tax (${(doc.taxRate ?? 0) / 100}%) ${money(amounts.tax)}</p><p class="total"><strong>Total ${money(amounts.total)}</strong></p>${proposal ? "" : `<p style="text-align:right">Received ${money(balance.paid)}<br><strong>Balance due ${money(balance.remaining)} · ${escape(balance.status)}</strong></p>`}<p>${escape(doc.terms)}</p><footer>Prepared with ClientDesk · Amounts in INR</footer></body></html>`);
   popup.document.close();
 }
 export function downloadFile(file) {

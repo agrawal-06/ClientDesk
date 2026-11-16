@@ -1,6 +1,9 @@
+import { invoiceAmounts, validateInvoiceReceipts } from "./invoices.js";
+import { validateLeads } from "./planning.js";
 import { isCalendarDate, today } from "./domain.js";
 
 export const collections = [
+  "leads",
   "notes",
   "followups",
   "expenses",
@@ -11,7 +14,10 @@ export const collections = [
 ];
 export function business(data) {
   return Object.fromEntries(
-    collections.map((key) => [key, data.business?.[key] || []]),
+    collections.map((key) => [
+      key,
+      data.business?.[key] === undefined ? [] : data.business[key],
+    ]),
   );
 }
 const text = (value, max = 4000) =>
@@ -19,12 +25,7 @@ const text = (value, max = 4000) =>
 const id = (value) => text(value, 200) && value.length > 0;
 const amount = (value) =>
   Number.isSafeInteger(value) && value > 0 && value <= 100000000000;
-export function total(document) {
-  return document.items.reduce(
-    (sum, item) => sum + item.quantity * item.rate,
-    0,
-  );
-}
+export const total = (document) => invoiceAmounts(document).total;
 export function validateBusiness(data) {
   if (data.business === undefined) return;
   if (
@@ -34,6 +35,8 @@ export function validateBusiness(data) {
   )
     throw Error("Invalid business tools data.");
   const b = business(data);
+  if (!Array.isArray(b.leads)) throw Error("Invalid leads.");
+  validateLeads(data, b.leads);
   const clients = new Set(data.clients.map((c) => c.id));
   const projects = new Map(data.projects.map((p) => [p.id, p]));
   for (const key of collections) {
@@ -104,9 +107,11 @@ export function validateBusiness(data) {
               i.quantity > 10000 ||
               !amount(i.rate),
           ) ||
-          !amount(total(row))
+          !Number.isSafeInteger(total(row)) ||
+          total(row) < 0
         )
           throw Error("Invalid document. Check line items and totals.");
+        if (key === "invoices") validateInvoiceReceipts(row);
         if (
           key !== "recurring" &&
           (!isCalendarDate(row.date) ||
@@ -175,6 +180,9 @@ export function generateDue(data, date = today()) {
           issuer: template.issuer,
           terms: template.terms,
           items: template.items,
+          discountType: template.discountType ?? "fixed",
+          discountValue: template.discountValue ?? 0,
+          taxRate: template.taxRate ?? 0,
           date: nextDate,
           due: addDays(nextDate, template.dueDays),
         });
@@ -211,6 +219,15 @@ export function portalData(data, clientId) {
         items: i.items,
         date: i.date,
         due: i.due,
+        discountType: i.discountType ?? "fixed",
+        discountValue: i.discountValue ?? 0,
+        taxRate: i.taxRate ?? 0,
+        receipts: (i.receipts ?? []).map((r) => ({
+          id: r.id,
+          amount: r.amount,
+          date: r.date,
+          ...(r.voidedAt ? { voidedAt: r.voidedAt } : {}),
+        })),
       })),
   };
 }

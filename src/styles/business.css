@@ -332,3 +332,166 @@
     padding: 14px;
   }
 }
+/* Native controls keep the calendar and pipeline usable with touch or keyboard. */
+.business-heading[hidden] {
+  display: none;
+}
+.calendar-toolbar {
+  margin-bottom: 18px;
+}
+.calendar-toolbar h3 {
+  min-width: 180px;
+  margin: 0;
+  font:
+    24px Georgia,
+    serif;
+}
+.calendar-toolbar label {
+  font-size: 13px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 5px;
+  margin: 20px 0;
+}
+.calendar-weekday {
+  text-align: center;
+  padding: 8px;
+  font-size: 12px;
+  color: #68725f;
+}
+.business-tools .calendar-day {
+  min-height: 100px;
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  gap: 5px;
+  padding: 8px;
+  background: #fbf8ef;
+  overflow: hidden;
+}
+.calendar-day.outside {
+  opacity: 0.5;
+}
+.business-tools .calendar-day.today {
+  border: 2px solid #bd603b;
+}
+.business-tools .calendar-day.selected {
+  background: #dfe8d6;
+  border-color: #54714c;
+  box-shadow: inset 0 2px 5px #35482d22;
+}
+.calendar-chip {
+  font-size: 11px;
+  line-height: 1.4;
+  padding: 4px;
+  border-radius: 3px;
+  background: #ece5cc;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.calendar-chip.complete {
+  background: #dbe6d5;
+}
+.calendar-count {
+  display: none;
+}
+.lead-board {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin: 20px 0;
+}
+.lead-column {
+  background: #ece8dc;
+  border: 1px solid #d8cfbb;
+  border-radius: 9px;
+  padding: 14px;
+  min-width: 0;
+}
+.lead-column > h3 {
+  font:
+    21px Georgia,
+    serif;
+  margin: 0 0 16px;
+  display: flex;
+  justify-content: space-between;
+}
+.lead-card {
+  background: #fffdf5;
+  border: 1px solid #d8d2bf;
+  box-shadow: 0 3px 5px #40372512;
+  border-radius: 6px;
+  padding: 14px;
+  margin-bottom: 12px;
+  overflow-wrap: anywhere;
+}
+.lead-card p {
+  font-size: 13px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+.lead-card .business-actions {
+  margin-top: 14px;
+}
+.lead-overdue {
+  color: #9b3f29;
+}
+.invoice-fieldset {
+  border: 0;
+  padding: 0;
+  margin: 0 0 24px;
+  min-width: 0;
+}
+.invoice-fieldset > .primary {
+  margin-top: 16px;
+}
+.invoice-details > h4,
+.invoice-details h3 {
+  margin: 0;
+}
+.invoice-details form {
+  min-width: 0;
+}
+@media (max-width: 900px) {
+  .lead-board {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 600px) {
+  .lead-board {
+    grid-template-columns: 1fr;
+  }
+  .calendar-grid {
+    gap: 3px;
+  }
+  .business-tools .calendar-day {
+    min-height: 60px;
+    padding: 6px;
+  }
+  .calendar-chip {
+    display: none;
+  }
+  .calendar-count {
+    display: block;
+    font-size: 10px;
+    color: #55674e;
+  }
+  .calendar-toolbar h3 {
+    min-width: 150px;
+    font-size: 21px;
+  }
+  .calendar-toolbar {
+    gap: 8px;
+  }
+  .calendar-toolbar label {
+    width: 100%;
+    padding-top: 8px;
+  }
+}
