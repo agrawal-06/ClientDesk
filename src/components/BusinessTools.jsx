@@ -90,10 +90,13 @@ export default function BusinessTools({ workspace, account }) {
   const [invoiceId, setInvoiceId] = useState(null);
   const [form, setForm] = useState(null),
     [now, setNow] = useState(Date.now());
+  const running = b.timeEntries.find((t) => t.endedAt === null);
   useEffect(() => {
+    if (tab !== "timeEntries" || !running) return;
+    setNow(Date.now());
     const timer = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(timer);
-  }, []);
+  }, [tab, running?.id]);
   const request = (body) =>
     cloudRequest(
       "/api/business",
@@ -238,7 +241,6 @@ export default function BusinessTools({ workspace, account }) {
       setMessage("Saved.");
     });
   }
-  const running = b.timeEntries.find((t) => t.endedAt === null);
   const expenseTotal = b.expenses.reduce((n, e) => n + e.amount, 0);
   const collected = activePayments(d).reduce((n, p) => n + p.amount, 0);
   const blocked = busy || workspace.saving || workspace.stale;

@@ -60,8 +60,14 @@ export default function LeadPipeline({ data, onSave, disabled }) {
           type={type}
           required={key === "name"}
           maxLength={200}
-          value={form[key]}
-          onChange={(e) => setForm({ ...form, [key]: e.target.value })}
+          name={key}
+          {...(type === "date"
+            // Keep incomplete native date entry intact during unrelated renders.
+            ? { defaultValue: form[key] }
+            : { value: form[key], onChange: (e) => {
+                const value = e.target.value;
+                setForm(current => ({ ...current, [key]: value }));
+              } })}
         />
       </label>
     );
@@ -123,11 +129,14 @@ export default function LeadPipeline({ data, onSave, disabled }) {
       {form && (
         <form
           className="business-form"
+          key={form.id}
           onSubmit={(e) => {
             e.preventDefault();
+            const nextFollowup = new FormData(e.currentTarget).get("nextFollowup");
             run(async () => {
               const row = {
                 ...form,
+                nextFollowup,
                 name: form.name.trim(),
                 email: form.email.trim(),
                 value: Number(form.value) === 0 ? 0 : parseMoney(form.value),
